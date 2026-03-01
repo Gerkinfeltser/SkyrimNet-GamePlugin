@@ -5,7 +5,9 @@
     {% if npc.isFollowing %}
         - {{ npc.name }} is following {{ player.name }}
     {% endif %}
-    {% if npc.furniture != "None" %}
+    {% if is_unconscious(npc.UUID) %}
+        - {{ npc.name }} is currently unconscious & unresponsive
+    {% elif npc.furniture != "None" %}
         {# Convert furniture name to lowercase for matching #}
         {% set furniture_lower = lower(npc.furniture) %}
 
