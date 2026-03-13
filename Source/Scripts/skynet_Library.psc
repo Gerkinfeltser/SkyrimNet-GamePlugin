@@ -124,47 +124,6 @@ Function RegisterActions()
 EndFunction
 
 ; -----------------------------------------------------------------------------
-; --- Skynet Package Parsing ---
-; -----------------------------------------------------------------------------
-
-Package Function GetPackageFromString(String asPackage)
-    if asPackage == "TalkToPlayer"
-        return packageDialoguePlayer
-    elseif asPackage == "TalkToNPC"
-        return packageDialogueNPC
-    elseif asPackage == "FollowPlayer"
-        return packageFollowPlayer
-    endif
-    return None
-EndFunction
-
-Function ApplyPackageOverrideToActor(Actor akActor, String asString, Int priority = 1, Int flags = 0)
-    Package _pck = GetPackageFromString(asString)
-    if !_pck
-        skynet.Error("Could not retrieve package for: " + asString)
-        return
-    endif
-    skynet.Info("Applying package override " + asString + " to " + akActor.GetDisplayName())
-    ActorUtil.AddPackageOverride(akActor, _pck, priority, flags)
-    akActor.EvaluatePackage()
-    DispatchPackageAddedEvent(akActor, _pck, asString)
-    skynet.Info("Dispatched package remove event for " + akActor.GetDisplayName() + " with package " + asString)
-EndFunction
-
-Function RemovePackageOverrideFromActor(Actor akActor, String asString)
-    Package _pck = GetPackageFromString(asString)
-    if !_pck
-        skynet.Error("Could not retrieve package for: " + asString)
-        return
-    endif
-    skynet.Info("Removing package override " + asString + " from " + akActor.GetDisplayName())
-    ActorUtil.RemovePackageOverride(akActor, _pck)
-    akActor.EvaluatePackage()
-    DispatchPackageRemovedEvent(akActor, _pck, asString)
-    skynet.Info("Dispatched package remove event for " + akActor.GetDisplayName() + " with package " + asString)
-EndFunction
-
-; -----------------------------------------------------------------------------
 ; --- Skynet Papyrus Actions ---
 ; -----------------------------------------------------------------------------
 
@@ -264,12 +223,6 @@ EndFunction
 
 
 Bool Function RegisterAnimationActions()
-    SkyrimNetApi.RegisterAction("SlapTarget", "Slap the target.", \
-                                "SkyrimNetInternal", "Animation_IsEligible", \
-                                "SkyrimNetInternal", "AnimationSlapActor", \
-                                "", "PAPYRUS", \
-                                1, "{\"target\": \"Actor\"}")
-
     SkyrimNetApi.RegisterAction("Gesture", "Perform a gesture to emphasize your words.", \
                                 "SkyrimNetInternal", "Animation_IsEligible", \
                                 "SkyrimNetInternal", "AnimationGeneric", \
@@ -485,30 +438,6 @@ Bool Function RegisterTags()
     return true
 EndFunction
 
-
-; -----------------------------------------------------------------------------
-; --- Event Dispatchers
-; -----------------------------------------------------------------------------
-
-Function DispatchPackageAddedEvent(Actor akActor, Package pkg, String packageName)
- int handle = ModEvent.Create("SkyrimNet_OnPackageAdded")
-  if handle
-    modEvent.PushForm(handle,akActor)
-    modEvent.PushForm(handle,pkg)
-    modEvent.PushString(handle, packageName)
-    modEvent.Send(handle)
-endif
-EndFunction
-
-Function DispatchPackageRemovedEvent(Actor akActor, Package pkg, String packageName)
- int handle = ModEvent.Create("SkyrimNet_OnPackageRemoved")
-  if handle
-    modEvent.PushForm(handle,akActor)
-    modEvent.PushForm(handle,pkg)
-    modEvent.PushString(handle, packageName)
-    modEvent.Send(handle)
-endif
-EndFunction
 
 ; -----------------------------------------------------------------------------
 ; ---- VRIK Integration ----
@@ -737,13 +666,10 @@ EndEvent
 Int Property hotkeyRecordSpeech = -1 Auto Hidden
 Int Property hotkeyTextInput = -1 Auto Hidden
 Int Property hotkeyToggleGameMaster = -1 Auto Hidden
-Int Property hotkeyTextThought = -1 Auto Hidden
 Int Property hotkeyVoiceThought = -1 Auto Hidden
-Int Property hotkeyTextDialogueTransform = -1 Auto Hidden
 Int Property hotkeyVoiceDialogueTransform = -1 Auto Hidden
 Int Property hotkeyToggleContinuousMode = -1 Auto Hidden
 Int Property hotkeyToggleWorldEventReactions = -1 Auto Hidden
-Int Property hotkeyDirectInput = -1 Auto Hidden
 Int Property hotkeyVoiceDirectInput = -1 Auto Hidden
 Int Property hotkeyContinueNarration = -1 Auto Hidden
 Int Property hotkeyToggleWhisperMode = -1 Auto Hidden
@@ -809,14 +735,8 @@ Function RegisterConfiguredHotkeys()
     If hotkeyToggleGameMaster != -1
         RegisterForKey(hotkeyToggleGameMaster)
     EndIf
-    If hotkeyTextThought != -1
-        RegisterForKey(hotkeyTextThought)
-    EndIf
     If hotkeyVoiceThought != -1
         RegisterForKey(hotkeyVoiceThought)
-    EndIf
-    If hotkeyTextDialogueTransform != -1
-        RegisterForKey(hotkeyTextDialogueTransform)
     EndIf
     If hotkeyVoiceDialogueTransform != -1
         RegisterForKey(hotkeyVoiceDialogueTransform)
@@ -826,9 +746,6 @@ Function RegisterConfiguredHotkeys()
     EndIf
     If hotkeyToggleWorldEventReactions != -1
         RegisterForKey(hotkeyToggleWorldEventReactions)
-    EndIf
-    If hotkeyDirectInput != -1
-        RegisterForKey(hotkeyDirectInput)
     EndIf
     If hotkeyVoiceDirectInput != -1
         RegisterForKey(hotkeyVoiceDirectInput)
@@ -864,14 +781,8 @@ Function UnregisterAllHotkeys()
     If hotkeyToggleGameMaster != -1
         UnregisterForKey(hotkeyToggleGameMaster)
     EndIf
-    If hotkeyTextThought != -1
-        UnregisterForKey(hotkeyTextThought)
-    EndIf
     If hotkeyVoiceThought != -1
         UnregisterForKey(hotkeyVoiceThought)
-    EndIf
-    If hotkeyTextDialogueTransform != -1
-        UnregisterForKey(hotkeyTextDialogueTransform)
     EndIf
     If hotkeyVoiceDialogueTransform != -1
         UnregisterForKey(hotkeyVoiceDialogueTransform)
@@ -881,9 +792,6 @@ Function UnregisterAllHotkeys()
     EndIf
     If hotkeyToggleWorldEventReactions != -1
         UnregisterForKey(hotkeyToggleWorldEventReactions)
-    EndIf
-    If hotkeyDirectInput != -1
-        UnregisterForKey(hotkeyDirectInput)
     EndIf
     If hotkeyVoiceDirectInput != -1
         UnregisterForKey(hotkeyVoiceDirectInput)
@@ -1033,16 +941,10 @@ Function HandleHotkeyPress(Int keyCode)
         SkyrimNetApi.TriggerTextInput()
     ElseIf keyCode == hotkeyToggleGameMaster && hotkeyToggleGameMaster != -1
         SkyrimNetApi.TriggerToggleGameMaster()
-    ElseIf keyCode == hotkeyTextThought && hotkeyTextThought != -1
-        SkyrimNetApi.TriggerTextThought()
-    ElseIf keyCode == hotkeyTextDialogueTransform && hotkeyTextDialogueTransform != -1
-        SkyrimNetApi.TriggerTextDialogueTransform()
     ElseIf keyCode == hotkeyToggleContinuousMode && hotkeyToggleContinuousMode != -1
         SkyrimNetApi.TriggerToggleContinuousMode()
     ElseIf keyCode == hotkeyToggleWorldEventReactions && hotkeyToggleWorldEventReactions != -1
         SkyrimNetApi.TriggerToggleWorldEventReactions()
-    ElseIf keyCode == hotkeyDirectInput && hotkeyDirectInput != -1
-        SkyrimNetApi.TriggerDirectInput()
     ElseIf keyCode == hotkeyContinueNarration && hotkeyContinueNarration != -1
         SkyrimNetApi.TriggerContinueNarration()
     ElseIf keyCode == hotkeyToggleWhisperMode && hotkeyToggleWhisperMode != -1

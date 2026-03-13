@@ -9,13 +9,10 @@ int toggleInGameHotkeys
 int optionHotkeyRecordSpeech
 int optionHotkeyTextInput
 int optionHotkeyToggleGameMaster
-int optionHotkeyTextThought
 int optionHotkeyVoiceThought
-int optionHotkeyTextDialogueTransform
 int optionHotkeyVoiceDialogueTransform
 int optionHotkeyToggleContinuousMode
 int optionHotkeyToggleWorldEventReactions
-int optionHotkeyDirectInput
 int optionHotkeyVoiceDirectInput
 int optionHotkeyContinueNarration
 int optionHotkeyToggleWhisperMode
@@ -268,9 +265,6 @@ function DisplayHotkeys()
         AddHeaderOption("")
         
         optionHotkeyTextInput = AddKeyMapOption("Text Input", library.hotkeyTextInput)
-        optionHotkeyTextThought = AddKeyMapOption("Text Thought", library.hotkeyTextThought)
-        optionHotkeyTextDialogueTransform = AddKeyMapOption("Text Dialogue Transform", library.hotkeyTextDialogueTransform)
-        optionHotkeyDirectInput = AddKeyMapOption("Direct Input", library.hotkeyDirectInput)
         
         AddHeaderOption("System Hotkeys")
         AddHeaderOption("")
@@ -954,14 +948,8 @@ event OnOptionKeyMapChange(int option, int keyCode, string conflictControl, stri
     elseif option == optionHotkeyToggleGameMaster
         library.hotkeyToggleGameMaster = finalKeyCode
         SetKeyMapOptionValue(option, keyCode)
-    elseif option == optionHotkeyTextThought
-        library.hotkeyTextThought = finalKeyCode
-        SetKeyMapOptionValue(option, keyCode)
     elseif option == optionHotkeyVoiceThought
         library.hotkeyVoiceThought = finalKeyCode
-        SetKeyMapOptionValue(option, keyCode)
-    elseif option == optionHotkeyTextDialogueTransform
-        library.hotkeyTextDialogueTransform = finalKeyCode
         SetKeyMapOptionValue(option, keyCode)
     elseif option == optionHotkeyVoiceDialogueTransform
         library.hotkeyVoiceDialogueTransform = finalKeyCode
@@ -971,9 +959,6 @@ event OnOptionKeyMapChange(int option, int keyCode, string conflictControl, stri
         SetKeyMapOptionValue(option, keyCode)
     elseif option == optionHotkeyToggleWorldEventReactions
         library.hotkeyToggleWorldEventReactions = finalKeyCode
-        SetKeyMapOptionValue(option, keyCode)
-    elseif option == optionHotkeyDirectInput
-        library.hotkeyDirectInput = finalKeyCode
         SetKeyMapOptionValue(option, keyCode)
     elseif option == optionHotkeyVoiceDirectInput
         library.hotkeyVoiceDirectInput = finalKeyCode
@@ -997,7 +982,7 @@ event OnOptionKeyMapChange(int option, int keyCode, string conflictControl, stri
         library.hotkeyInterruptDialogue = finalKeyCode
         SetKeyMapOptionValue(option, keyCode)
     endif
-    
+
     ; Re-register hotkeys to pick up the change immediately
     if library.inGameHotkeysEnabled
         library.UnregisterAllHotkeys()
@@ -1019,14 +1004,8 @@ event OnOptionDefault(int option)
     elseif option == optionHotkeyToggleGameMaster
         library.hotkeyToggleGameMaster = -1
         SetKeyMapOptionValue(option, -1)
-    elseif option == optionHotkeyTextThought
-        library.hotkeyTextThought = -1
-        SetKeyMapOptionValue(option, -1)
     elseif option == optionHotkeyVoiceThought
         library.hotkeyVoiceThought = -1
-        SetKeyMapOptionValue(option, -1)
-    elseif option == optionHotkeyTextDialogueTransform
-        library.hotkeyTextDialogueTransform = -1
         SetKeyMapOptionValue(option, -1)
     elseif option == optionHotkeyVoiceDialogueTransform
         library.hotkeyVoiceDialogueTransform = -1
@@ -1036,9 +1015,6 @@ event OnOptionDefault(int option)
         SetKeyMapOptionValue(option, -1)
     elseif option == optionHotkeyToggleWorldEventReactions
         library.hotkeyToggleWorldEventReactions = -1
-        SetKeyMapOptionValue(option, -1)
-    elseif option == optionHotkeyDirectInput
-        library.hotkeyDirectInput = -1
         SetKeyMapOptionValue(option, -1)
     elseif option == optionHotkeyVoiceDirectInput
         library.hotkeyVoiceDirectInput = -1
@@ -1062,7 +1038,7 @@ event OnOptionDefault(int option)
         library.hotkeyInterruptDialogue = -1
         SetKeyMapOptionValue(option, -1)
     endif
-    
+
     ; Re-register hotkeys to pick up the change immediately
     if library.inGameHotkeysEnabled
         library.UnregisterAllHotkeys()

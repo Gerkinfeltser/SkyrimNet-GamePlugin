@@ -31,3 +31,9 @@ SkyrimSE.code-workspace
 .claude/settings.local.json
 CLAUDE.local.md
 AGENTS.md
+
+# Build artifacts
+Scripts/
+SkyrimNet.esp
+
+PrismaUI/views/SkyrimNet/chat/chat.js

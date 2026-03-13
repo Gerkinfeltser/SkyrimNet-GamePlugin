@@ -92,16 +92,17 @@ int function RegisterDialogueToListener(Actor speaker, Actor listener, String di
 
 ; Immediately purge all ongoing NPC dialogue
 ; This function stops all dialogue processing:
-; - Interrupts currently playing audio
-; - Clears the audio queue
 ; - Clears the speech/TTS generation queue
 ; - Clears streaming text buffers
 ; - Clears dialogue queues for all actors
 ; - Invalidates pending TTS generation tasks
+; If abDeferToCurrentFinished is false (default): also interrupts currently playing audio immediately
+; If abDeferToCurrentFinished is true: allows currently playing audio to finish naturally;
+;   only queues are cleared so nothing follows after the current line ends
 ; Note: This is a blocking call on the Papyrus thread. For non-blocking behavior
 ; with hotkey-style checks and notifications, use TriggerInterruptDialogue() instead.
-; Returns 1 if audio was interrupted mid-playback, 0 otherwise
-int function PurgeDialogue() Global Native
+; Returns 1 if audio was interrupted mid-playback, 0 otherwise (always 0 in deferred mode)
+int function PurgeDialogue(bool abDeferToCurrentFinished = false) Global Native
 
 ; -----------------------------------------------------------------------------
 ; --- Package Management ---
@@ -221,6 +222,22 @@ int function DirectNarration(String content, Actor originatorActor = None, Actor
 ; 
 ; Returns 0 on success, 1 on failure (including empty content)
 int function RegisterPersistentEvent(String content, Actor originatorActor = None, Actor targetActor = None) Global Native
+
+; Transform freeform text into player dialogue using the LLM dialogue pipeline
+; This is the API equivalent of the "Transform Dialogue" hotkey feature.
+; The text is processed through the player dialogue prompt template, transformed
+; by the LLM into character-appropriate speech, and then spoken by the player.
+; Nearby NPCs will react to the transformed dialogue.
+;
+; This function is asynchronous - it returns immediately and the dialogue
+; processing happens in the background.
+;
+; Examples:
+; TransformDialogue("I need to buy some potions") ; Player says this in-character
+; TransformDialogue("Tell me about the recent dragon attack")
+;
+; Returns 0 on success, 1 on failure (including empty text)
+int function TransformDialogue(String dialogueText) Global Native
 
 ; -----------------------------------------------------------------------------
 ; --- Utility Functions ---
@@ -648,14 +665,23 @@ int function TriggerGenerateDiaryBio() Global Native
 ; -----------------------------------------------------------------------------
 
 ; Simulates pressing the interrupt dialogue hotkey
-; - Immediately stops all ongoing NPC dialogue
-; - Clears the audio queue and any currently playing speech
-; - Clears the speech/TTS generation queue
-; - Clears streaming text buffers
-; - Clears dialogue queues for all actors
+; - Clears the audio queue and speech/TTS generation queue
+; - Clears streaming text buffers and dialogue queues for all actors
+; If abDeferToCurrentFinished is false (default): also interrupts currently playing audio immediately
+; If abDeferToCurrentFinished is true: allows currently playing audio to finish naturally;
+;   only queues are cleared so nothing follows after the current line ends
 ; Useful for cutting off NPCs mid-sentence or clearing stuck dialogue
 ; Returns 0 on success, 1 on failure
-int function TriggerInterruptDialogue() Global Native
+int function TriggerInterruptDialogue(bool abDeferToCurrentFinished = false) Global Native
+
+; Simulates pressing the silent narration hotkey
+; - Shows "Enter silent narration text..." notification
+; - Opens text input dialog for silent event registration
+; - Registers a persistent_generic event that informs actors without triggering NPC responses
+; - Useful for establishing facts or outcomes without causing dialogue
+; Functions identically to pressing the configured silent narration key
+; Returns 0 on success
+int function TriggerSilentNarration() Global Native
 
 ; -----------------------------------------------------------------------------
 ; --- Events ---

@@ -64,42 +64,13 @@ Function SetLookAt(Actor akActor, Actor akTarget = None) global
     endif
 EndFunction
 
-Function AddPackageToActor(Actor akActor, string packageName, int priority, int flags) global
-    Debug.Trace("[SkyrimNetInternal] AddPackageToActor called for " + akActor.GetDisplayName() + " with package " + packageName + " and priority " + priority + " and flags " + flags)
-    skynet_MainController skynet = ((Game.GetFormFromFile(0x0802, "SkyrimNet.esp") as Quest) As skynet_MainController)
-    if !skynet
-        Debug.MessageBox("Fatal Error: AddPackageToActor failed to retrieve controller.")
-        return
-    endif
-    skynet.libs.ApplyPackageOverrideToActor(akActor, packageName, priority, flags)
-EndFunction
-
-Function RemovePackageFromActor(Actor akActor, string packageName) global
-    Debug.Trace("[SkyrimNetInternal] RemovePackageFromActor called for " + akActor.GetDisplayName() + " with package " + packageName)
-    skynet_MainController skynet = ((Game.GetFormFromFile(0x0802, "SkyrimNet.esp") as Quest) As skynet_MainController)
-    if !skynet
-        Debug.MessageBox("Fatal Error: RemovePackageFromActor failed to retrieve controller.")
-        return
-    endif
-    skynet.libs.RemovePackageOverrideFromActor(akActor, packageName)
-EndFunction
-
 ; -----------------------------------------------------------------------------
 ; --- Player Input Handlers ---
 ; -----------------------------------------------------------------------------
 
 string Function GetPlayerInput() global
-    Debug.Trace("[SkyrimNetInternal] GetPlayerInput called")
-    UIExtensions.OpenMenu("UITextEntryMenu")
-    ; Don't do this if we're in VR
-    if SkyrimNetApi.IsRunningVR()
-        Debug.Trace("[SkyrimNetInternal] GetPlayerInput: Skipping input in VR")
-        Debug.Notification("Text input is disabled in VR")
-        return ""
-    endif
-    string messageText = UIExtensions.GetMenuResultString("UITextEntryMenu")
-    Debug.Trace("[SkyrimNetInternal] GetPlayerInput returned: " + messageText)
-    return messageText
+    Debug.Trace("[SkyrimNetInternal] GetPlayerInput: Papyrus text input removed, use PrismaUI")
+    return ""
 EndFunction
 
 ; -----------------------------------------------------------------------------
@@ -201,24 +172,6 @@ Function AnimationGeneric(Actor akOriginator, string contextJson, string paramsJ
 
     Debug.Trace("[SkyrimNetInternal] AnimationGeneric: Playing: " + _anim)
     skynet.libs.PlayGenericAnimation(akOriginator, _anim)
-EndFunction
-
-Function AnimationSlapActor(Actor akOriginator, string contextJson, string paramsJson) global
-    actor akTarget = SkyrimNetApi.GetJsonActor(paramsJson, "target", Game.GetPlayer())
-    sound slapSound = Game.GetFormFromFile(0x0E98, "SkyrimNet.esp") as Sound
-    if (!akOriginator || !akTarget)
-        Debug.Trace("[SkyrimNetInternal] AnimationSlapActor: akOriginator or akTarget is null")
-        return
-    endif
-    Debug.Trace("[SkyrimNetInternal] AnimationSlapActor: Slapping " + akTarget.GetDisplayName() + " with " + akOriginator.GetDisplayName())
-    akTarget.SetDontMove()
-    akOriginator.MoveTo(akTarget, 40.0 * Math.Sin(akTarget.GetAngleZ()), 40.0 * Math.Cos(akTarget.GetAngleZ()))
-    akOriginator.SetAngle(0.0, 0.0, akTarget.GetAngleZ()+180.0)
-    debug.sendanimationevent(akOriginator, "SMplayerslaps")
-    slapSound.play(akTarget)
-    utility.wait(0.8)
-    akOriginator.pushactoraway(akTarget,1)
-    akTarget.SetDontMove(false)
 EndFunction
 
 Function AnimationPrayer(Actor akOriginator, string contextJson, string paramsJson) global
