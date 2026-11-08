@@ -75,11 +75,6 @@
             "MutagenObjectType": "ScriptObjectProperty",
             "Name": "skynet_VoiceInputTransformSpell",
             "Object": "0012D8:SkyrimNet.esp"
-          },
-          {
-            "MutagenObjectType": "ScriptObjectProperty",
-            "Name": "skynet_WheelMenuSpell",
-            "Object": "000D65:SkyrimNet.esp"
           }
         ]
       },

@@ -107,7 +107,7 @@ Stuck? Ask on [Discord](https://discord.gg/gHHS7HpJS9).
 <summary><b>Optional extras, and Skyrim SE / VR specifics</b></summary>
 
 **Optional**
-- [UIExtensions](https://www.nexusmods.com/skyrimspecialedition/mods/17561), for the input wheel.
+- [UIExtensions](https://www.nexusmods.com/skyrimspecialedition/mods/17561), for the in-game configuration utility menu (`skynet_ConfigUtilityMenu`).
 - [CUDA Toolkit 12.x](https://developer.nvidia.com/cuda-12-9-1-download-archive) (**not** 13.x), to speed up speech recognition on NVIDIA GPUs. Restart your PC after installing it. The Speech-to-Text test on the Test & Easy Setup page shows whether CUDA is in use.
 
 **Skyrim SE without ESL support**

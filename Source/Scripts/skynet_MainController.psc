@@ -2,7 +2,6 @@ ScriptName skynet_MainController extends Quest
 
 skynet_Library Property libs Auto
 Actor property playerRef Auto Hidden
-Spell property skynet_WheelMenuSpell auto
 Spell property skynet_VoiceInputDirectSpell auto
 Spell property skynet_VoiceInputNormalSpell auto
 Spell property skynet_VoiceInputThoughtSpell auto
@@ -42,9 +41,6 @@ EndFunction
 
 Function AddSpells()
 
-	If !playerRef.HasSpell(skynet_WheelMenuSpell)
-		playerRef.AddSpell(skynet_WheelMenuSpell, False)
-	Endif
 
 	; If !playerRef.HasSpell(skynet_VoiceInputDirectSpell)
 	;	playerRef.AddSpell(skynet_VoiceInputDirectSpell, False)
